@@ -72,6 +72,7 @@ Character-level n-grams handle misspellings and slang common in online comments 
 - [ ] Fine-tune **DistilBERT** for richer text representations
 - [ ] Try **XGBoost / LightGBM** on TF-IDF features
 - [ ] Engineer time features from `created_date`
+- [ ] Improve handling of class imbalance
 
 ---
 
