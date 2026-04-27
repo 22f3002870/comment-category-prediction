@@ -98,5 +98,5 @@ Open notebook and run all cells.
 
 ## 👨‍💻 Author
 
-Your Name
+Parkhi Yadav
 
