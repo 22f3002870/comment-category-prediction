@@ -1,102 +1,81 @@
-# comment-category-prediction
-Kaggle ML project for multi-class text classification using TF-IDF and Logistic Regression
+# 💬 Comment Category Prediction — Kaggle NLP Challenge
 
-#  Comment Category Prediction (Kaggle)
+[![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python)](https://www.python.org/)
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-1.x-orange?logo=scikit-learn)](https://scikit-learn.org/)
+[![Kaggle](https://img.shields.io/badge/Kaggle-Competition-20BEFF?logo=kaggle)](https://www.kaggle.com/)
 
-## 📌 Problem Statement
-
-Predict the category (0–3) of user comments using text and metadata.
-
-This is a **multi-class text classification problem** with imbalanced classes.
+> Multi-class NLP classification of **300,000 social media comments** into 4 categories — Kaggle competition | **Macro F1: 0.8026**
 
 ---
 
-## 📊 Dataset Overview
+## 🧩 Problem Statement
 
-* Train: 198,000 rows
-* Test: 102,000 rows
-* Features:
-
-  * Text: `comment` (most important)
-  * Numerical: upvotes, downvotes, interaction flags
-  * Categorical: race, religion, gender (dropped)
+Classify comments into 4 labels (0–3) using text content and engagement metadata. Key challenges: severe class imbalance (label 0 = 58%, label 3 = 2.8%), 73% missing demographic data, and 300K samples requiring scalable preprocessing.
 
 ---
 
-## 🔍 Key Insights (EDA)
+## 🚀 Highlights
 
-* ⚠️ Severe class imbalance → used **F1-score (macro)**
-* ❌ 73% missing values in categorical features → dropped
-* 📉 Highly skewed numerical data → scaled
-* 🧠 Text dominates prediction power
-
----
-
-## ⚙️ Feature Engineering
-
-* `comment_len`
-* `word_count`
-* TF-IDF (word + character level)
+- **Dual TF-IDF** — word-level (40K features) + character-level (15K features) via `FeatureUnion`
+- **Data leakage prevention** — all preprocessing inside `sklearn` Pipelines
+- **EDA-driven decisions** — dropped 73%-missing demographic columns after confirming zero predictive power
+- **Hyperparameter tuning** — `RandomizedSearchCV` with 3-fold CV optimized for macro F1
 
 ---
 
-## 🤖 Models Used
+## 📊 Model Comparison
 
-| Model               | F1 Score   |
-| ------------------- | ---------- |
-| Logistic Regression | 0.7856     |
-| SGD Classifier      | 0.7716     |
-| Naive Bayes         | 0.305      |
-| ✅ Final Model       | **0.8026** |
+| Model | Macro F1 |
+|-------|----------|
+| **Tuned Best Model** (Dual TF-IDF + LR) | **0.8026** ✅ |
+| Logistic Regression (baseline) | 0.7856 |
+| SGD Classifier | 0.7716 |
+| Multinomial Naive Bayes | 0.3051 ❌ |
+
+**Best Model — Validation Results:**
+
+| Label | Precision | Recall | F1 | Support |
+|-------|-----------|--------|----|---------|
+| 0 | 0.96 | 0.93 | 0.95 | 22,835 |
+| 1 | 0.70 | 0.82 | 0.76 | 3,183 |
+| 2 | 0.88 | 0.87 | 0.88 | 12,488 |
+| 3 | 0.56 | 0.73 | 0.63 | 1,094 |
+| **Macro Avg** | **0.77** | **0.84** | **0.80** | 39,600 |
+
+> Macro F1 was chosen over accuracy because a dummy model always predicting label 0 would hit 58% accuracy — but be completely useless. Macro F1 treats all 4 classes equally.
 
 ---
 
-## 🏆 Best Model
+## 🔬 Core Innovation — Dual TF-IDF
 
-* Dual TF-IDF (word + char)
-* Logistic Regression (C=0.8)
-* class_weight = balanced
+```python
+text_features = FeatureUnion([
+    ('word_tfidf', TfidfVectorizer(max_features=40000, ngram_range=(1,2), min_df=2, stop_words='english')),
+    ('char_tfidf', TfidfVectorizer(max_features=15000, analyzer='char', ngram_range=(3,5)))
+])
+```
 
----
+Character-level n-grams handle misspellings and slang common in online comments — a significant improvement over word-only models.
+
 
 ## 💡 Key Learnings
 
-* Text features > metadata
-* Removing noisy features improved performance
-* Character n-grams handle misspellings
+- **More features ≠ better model** — removing noisy columns improved F1 by ~0.017
+- **Character n-grams** handle real-world messy text far better than word-only approaches
+- **EDA should drive every decision** — no arbitrary choices in this pipeline
+- **Metric selection matters** — accuracy was 90%, but macro F1 told the honest story
 
 ---
 
-## 📁 Project Structure
+## 🔭 Future Work
 
-```
-notebooks/
-data/
-outputs/
-images/
-```
+- [ ] Fine-tune **DistilBERT** for richer text representations
+- [ ] Try **XGBoost / LightGBM** on TF-IDF features
+- [ ] Engineer time features from `created_date`
 
 ---
 
-## ▶️ How to Run
+## 👤 Author
 
-```bash
-pip install -r requirements.txt
-```
-
-Open notebook and run all cells.
-
----
-
-## 📌 Future Improvements
-
-* Try BERT / Transformer models
-* Better handling of class imbalance
-* Hyperparameter tuning with GridSearch
-
----
-
-## 👨‍💻 Author
-
-Parkhi Yadav
+**Parkhi Yadav**  [Kaggle](https://www.kaggle.com/code/parkhiyadav/22f3002870-notebook-t12026) ·
 
